@@ -1,0 +1,19 @@
+Data Extension,Field,Proposed Type,Primary Key,Nullable,Sendable,Purpose
+Customer_Master_DE,CustomerKey,Text(50),Yes,No,No,Customer identity key
+Customer_Master_DE,EmailAddress,EmailAddress/Text(254),No,No,No,Email channel address
+Customer_Master_DE,ConsentStatus,Text(20),No,No,No,Custom consent signal
+Customer_Master_DE,EmailsSentLast7Days,Number,No,No,No,Materialized convenience field; ledger remains authority
+Behavioral_Events_DE,EventID,Text(50),Yes,No,No,Unique behavioral event
+Behavioral_Events_DE,CartID,Text(100),No,Yes,No,Cart-level context
+Behavioral_Events_DE,EventTimestamp,Date,No,No,No,UTC event time
+Purchase_Events_DE,OrderID,Text(50),Yes,No,No,Unique order fixture
+Purchase_Events_DE,OrderTimestampUTC,Date,No,No,No,Authoritative order timing
+Purchase_Events_DE,OrderStatus,Text(30),No,No,No,Only COMPLETED qualifies
+Purchase_Events_DE,CartID,Text(100),No,Yes,No,Cart recovery linkage
+Journey_Audience_DE,CustomerKey,Text(50),Yes,No,Yes,SubscriberKey = CustomerKey
+High_Intent_Event_DE,EventID,Text(50),Yes,No,Yes,API-event grain
+High_Intent_Event_DE,CustomerKey,Text(50),No,No,Yes,SubscriberKey = CustomerKey
+Abandonment_Status_DE,EventID,Text(50),Yes,No,No,Event-level conversion state
+Journey2_Current_Status_DE,CustomerKey,Text(50),Yes,No,No,One current active Journey 2 status per customer
+Marketing_Send_Ledger_DE,SendID,Text(50),Yes,No,No,Timestamped marketing-send history
+Send_Reservation_DE,ReservationID,Text(50),Yes,No,No,Proposed cross-journey reservation control
