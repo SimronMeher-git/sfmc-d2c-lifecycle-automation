@@ -1,0 +1,33 @@
+%%[
+VAR @FirstName, @Category, @HeroLine, @Product1, @Product2, @CTALabel
+
+SET @FirstName = Trim(AttributeValue("FirstName"))
+SET @Category = Trim(AttributeValue("PreferredCategory"))
+
+IF Empty(@FirstName) THEN
+  SET @FirstName = "there"
+ENDIF
+
+IF @Category == "Haircare" THEN
+  SET @HeroLine = "Your Haircare journey starts here"
+  SET @Product1 = "Anti-Hairfall Shampoo"
+  SET @Product2 = "Hair Serum"
+  SET @CTALabel = "Explore Haircare"
+ELSEIF @Category == "Skincare" THEN
+  SET @HeroLine = "Start your Skincare routine"
+  SET @Product1 = "Vitamin C Face Serum"
+  SET @Product2 = "Daily Moisturiser"
+  SET @CTALabel = "Explore Skincare"
+ELSEIF @Category == "Bodycare" THEN
+  SET @HeroLine = "Everyday Bodycare, made simple"
+  SET @Product1 = "Body Lotion"
+  SET @Product2 = "Body Wash"
+  SET @CTALabel = "Explore Bodycare"
+ELSE
+  SET @Category = "Personal Care"
+  SET @HeroLine = "Discover everyday personal-care favourites"
+  SET @Product1 = "Bestselling Essentials"
+  SET @Product2 = "Everyday Care Favourites"
+  SET @CTALabel = "Explore Personal Care"
+ENDIF
+]%%
