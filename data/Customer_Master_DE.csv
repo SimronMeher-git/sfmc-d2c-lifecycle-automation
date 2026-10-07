@@ -1,0 +1,5 @@
+CustomerKey,EmailAddress,FirstName,SignupDate,PreferredCategory,LastPurchaseDate,TotalOrders,ConsentStatus,EmailsSentLast7Days
+CUST002,rahul@example.com,Rahul,2026-10-02,Haircare,,0,Opted_In,1
+CUST006,arjun@example.com,Arjun,2026-10-04,Bodycare,,0,Opted_In,0
+CUST009,isha@example.com,Isha,2026-10-05,Skincare,,0,Opted_In,0
+CUST_TEST_001,test.customer@example.com,Test,2026-10-01,Skincare,2026-10-06,2,Opted_In,2
