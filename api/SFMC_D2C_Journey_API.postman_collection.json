@@ -1,0 +1,218 @@
+{
+  "info": {
+    "_postman_id": "sfmc-d2c-portfolio-clean",
+    "name": "SFMC D2C Journey API - Portfolio",
+    "description": "Self-initiated Salesforce Marketing Cloud portfolio reference integration. Contains only the two SFMC requests used in the project: server-to-server OAuth and Journey Builder event firing. Credentials and tenant-specific values are placeholders. No live SFMC execution is claimed. A real tenant requires an Installed Package, Server-to-Server API Integration, appropriate permissions, and a configured API Event.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get SFMC OAuth Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.unset(\"access_token\");",
+              "pm.collectionVariables.unset(\"token_expires_at\");",
+              "",
+              "pm.test(\"OAuth status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "let jsonData = {};",
+              "try {",
+              "    jsonData = pm.response.json();",
+              "} catch (e) {",
+              "    pm.test(\"OAuth response is valid JSON\", function () {",
+              "        pm.expect.fail(\"Response was not valid JSON\");",
+              "    });",
+              "}",
+              "",
+              "pm.test(\"access_token is returned\", function () {",
+              "    pm.expect(jsonData.access_token).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "",
+              "if (pm.response.code === 200 && jsonData.access_token) {",
+              "    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+              "    if (jsonData.rest_instance_url) {",
+              "        const base = jsonData.rest_instance_url.endsWith(\"/\")",
+              "            ? jsonData.rest_instance_url",
+              "            : jsonData.rest_instance_url + \"/\";",
+              "        pm.collectionVariables.set(\"rest_base_uri\", base);",
+              "    }",
+              "    if (jsonData.expires_in) {",
+              "        const expiresAt = Date.now() + (Number(jsonData.expires_in) * 1000);",
+              "        pm.collectionVariables.set(\"token_expires_at\", String(expiresAt));",
+              "    }",
+              "} else {",
+              "    pm.collectionVariables.unset(\"access_token\");",
+              "}",
+              "",
+              "pm.test(\"expires_in is valid when returned\", function () {",
+              "    if (jsonData.expires_in !== undefined) {",
+              "        pm.expect(Number(jsonData.expires_in)).to.be.above(0);",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{auth_base_uri}}v2/token",
+          "host": [
+            "{{auth_base_uri}}v2"
+          ],
+          "path": [
+            "token"
+          ]
+        },
+        "description": "Reference request for SFMC server-to-server OAuth. The script clears stale token state first, asserts HTTP 200 and a non-empty access token, stores the returned token, normalizes rest_instance_url when supplied, and records expiry."
+      },
+      "response": []
+    },
+    {
+      "name": "Fire High-Intent Journey Event",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const token = pm.collectionVariables.get(\"access_token\");",
+              "const expiresAtRaw = pm.collectionVariables.get(\"token_expires_at\");",
+              "const expiresAt = expiresAtRaw ? Number(expiresAtRaw) : 0;",
+              "",
+              "if (!token || typeof token !== \"string\" || token.trim().length < 10) {",
+              "    throw new Error(\"No valid SFMC access token is available. Run the OAuth request first.\");",
+              "}",
+              "",
+              "if (expiresAt && Date.now() >= expiresAt) {",
+              "    pm.collectionVariables.unset(\"access_token\");",
+              "    throw new Error(\"SFMC access token is expired. Run the OAuth request again.\");",
+              "}",
+              "",
+              "if (!pm.collectionVariables.get(\"event_definition_key\")) {",
+              "    throw new Error(\"event_definition_key is not configured.\");",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "let jsonData = {};",
+              "try {",
+              "    jsonData = pm.response.json();",
+              "} catch (e) {",
+              "    pm.test(\"Event response is valid JSON\", function () {",
+              "        pm.expect.fail(\"Response was not valid JSON\");",
+              "    });",
+              "}",
+              "",
+              "pm.test(\"eventInstanceId is returned\", function () {",
+              "    pm.expect(jsonData.eventInstanceId).to.be.a(\"string\").and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"ContactKey\": \"CUST_TEST_001\",\n  \"EventDefinitionKey\": \"{{event_definition_key}}\",\n  \"Data\": {\n    \"EventID\": \"EVT_TEST_001\",\n    \"EventTimestamp\": \"2026-10-06T18:00:00Z\",\n    \"CustomerKey\": \"CUST_TEST_001\",\n    \"FirstName\": \"Test\",\n    \"EmailAddress\": \"test.customer@example.com\",\n    \"EventType\": \"Add_To_Cart\",\n    \"ProductCategory\": \"Skincare\",\n    \"ProductName\": \"Daily Moisturiser\",\n    \"CartValue\": 599,\n    \"CartID\": \"CART_TEST_001\",\n    \"CartURL\": \"https://example.com/cart/CART_TEST_001\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{rest_base_uri}}interaction/v1/events",
+          "host": [
+            "{{rest_base_uri}}interaction"
+          ],
+          "path": [
+            "v1",
+            "events"
+          ]
+        },
+        "description": "Reference Journey Builder event request. EventDefinitionKey must match a configured API Event whose schema contains the Data fields used here. A successful native call is expected to return HTTP 201 and eventInstanceId, but this collection has not been executed against a live SFMC tenant. CartURL is a sanitized portfolio placeholder; a real commerce implementation must supply a secure, validated deep link and must not expose personal data in query parameters. A pre-request guard blocks dispatch when the token is missing/obviously malformed, expired according to token_expires_at, or the EventDefinitionKey is not configured. Retry/backoff behavior remains documented design guidance rather than executable production orchestration."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "auth_base_uri",
+      "value": "https://YOUR_SUBDOMAIN.auth.marketingcloudapis.com/"
+    },
+    {
+      "key": "client_id",
+      "value": ""
+    },
+    {
+      "key": "client_secret",
+      "value": ""
+    },
+    {
+      "key": "rest_base_uri",
+      "value": "https://YOUR_SUBDOMAIN.rest.marketingcloudapis.com/"
+    },
+    {
+      "key": "event_definition_key",
+      "value": "APIEventHighIntentAbandonment"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "token_expires_at",
+      "value": ""
+    }
+  ]
+}
