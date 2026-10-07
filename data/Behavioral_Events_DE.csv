@@ -1,0 +1,4 @@
+EventID,CustomerKey,EventType,EventTimestamp,ProductCategory,ProductName,CartValue,Source,CartID
+EVT002,CUST002,Add_To_Cart,2026-10-05T10:22:00Z,Haircare,Anti-Hairfall Shampoo,499,Website,CART002
+EVT004,CUST006,Checkout_Started,2026-10-05T18:52:00Z,Bodycare,Body Lotion,449,Website,CART004
+EVT_TEST_001,CUST_TEST_001,Add_To_Cart,2026-10-06T18:00:00Z,Skincare,Daily Moisturiser,599,Website,CART_TEST_001
