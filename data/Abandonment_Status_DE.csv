@@ -1,0 +1,2 @@
+EventID,CustomerKey,ConvertedFlag,ConvertedOrderID,ConvertedAt,CartID
+EVT_TEST_001,CUST_TEST_001,TRUE,ORD_TEST_002,2026-10-06T21:00:00Z,CART_TEST_001
