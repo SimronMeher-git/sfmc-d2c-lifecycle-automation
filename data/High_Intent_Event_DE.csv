@@ -1,0 +1,2 @@
+EventID,EventTimestamp,CustomerKey,EmailAddress,FirstName,EventType,ProductCategory,ProductName,CartValue,CartID,CartURL
+EVT_TEST_001,2026-10-06T18:00:00Z,CUST_TEST_001,test.customer@example.com,Test,Add_To_Cart,Skincare,Daily Moisturiser,599,CART_TEST_001,https://example.com/cart/CART_TEST_001
