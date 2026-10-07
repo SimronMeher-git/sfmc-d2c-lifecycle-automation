@@ -1,0 +1,4 @@
+CustomerKey,EmailAddress,FirstName,PreferredCategory,SignupDate,TotalOrders,Segment
+CUST002,rahul@example.com,Rahul,Haircare,2026-10-02,0,First_Purchase_Prospect
+CUST006,arjun@example.com,Arjun,Bodycare,2026-10-04,0,First_Purchase_Prospect
+CUST009,isha@example.com,Isha,Skincare,2026-10-05,0,First_Purchase_Prospect
