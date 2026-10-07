@@ -1,0 +1,37 @@
+%%[
+VAR @FirstName, @EventType, @ProductCategory, @ProductName, @CartValue, @CartValueLine, @HeroLine
+
+SET @FirstName = Trim(AttributeValue("FirstName"))
+SET @EventType = Trim(AttributeValue("EventType"))
+SET @ProductCategory = Trim(AttributeValue("ProductCategory"))
+SET @ProductName = Trim(AttributeValue("ProductName"))
+SET @CartValue = AttributeValue("CartValue")
+
+IF Empty(@FirstName) THEN
+  SET @FirstName = "there"
+ENDIF
+
+IF Empty(@ProductCategory) THEN
+  SET @ProductCategory = "personal care"
+ENDIF
+
+IF Empty(@ProductName) THEN
+  SET @ProductName = "your selected product"
+ENDIF
+
+/* Upstream schema validation should ensure a numeric CartValue.
+   Empty values intentionally suppress the cart-value line. */
+IF Empty(@CartValue) THEN
+  SET @CartValueLine = ""
+ELSE
+  SET @CartValueLine = Concat("Cart value: ₹", FormatNumber(@CartValue, "N0"))
+ENDIF
+
+IF @EventType == "Checkout_Started" THEN
+  SET @HeroLine = "You’re almost there"
+ELSEIF @EventType == "Add_To_Cart" THEN
+  SET @HeroLine = "Pick up where you left off"
+ELSE
+  SET @HeroLine = "Still interested?"
+ENDIF
+]%%
